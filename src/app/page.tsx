@@ -1,7 +1,7 @@
 'use client'
 import { useRouter } from "next/navigation";
 import Loading from "./components/loading";
-import { useState } from "react";
+import React, { useState } from "react";
 import { LoadingProps } from "@/types/loading";
 import Notification from "./components/notification";
 import { notificationProps } from "@/types/notification";
@@ -37,7 +37,7 @@ export default function Home() {
     notification
   }, 5000);
 
-  async function login(e: SubmitEvent) {
+  async function login(e: React.FormEvent<HTMLFormElement>) {
 
     try {
 
@@ -66,9 +66,7 @@ export default function Home() {
             <div className="card-body">
               <h3 className="card-title text-center mb-4">Login</h3>
 
-              <form id="loginEvent" onSubmit={function (e) {
-                e.preventDefault()
-              }}>
+              <form id="loginEvent" onSubmit={login}>
                 <div className="mb-3">
                   <label htmlFor="email" className="form-label">E-mail</label>
                   <input type="email" className="form-control" id="email" placeholder="Digite seu e-mail"
