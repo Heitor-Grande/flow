@@ -1,7 +1,7 @@
 import jwt from "jsonwebtoken"
 import bcrypt from "bcrypt"
 import cryptoJS from "crypto-js"
-import { NextRequest, NextResponse } from "next/server"
+import { NextRequest } from "next/server"
 import responseApi from "../utils/responseApi"
 
 export function criptografar(dado: string) {

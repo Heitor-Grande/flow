@@ -1,7 +1,60 @@
 'use client'
 import { useRouter } from "next/navigation";
+import Loading from "./components/loading";
+import { useState } from "react";
+import { LoadingProps } from "@/types/loading";
+import Notification from "./components/notification";
+import { notificationProps } from "@/types/notification";
 
 export default function Home() {
+
+  const [loading, setLoading] = useState<LoadingProps>({
+    mensagem: "Carregando Login",
+    loading: false
+  })
+
+  const [notification, setNotification] = useState<notificationProps>({
+    mensagem: "mensagem",
+    onClose: function () {
+      setNotification({
+        ...notification,
+        show: false
+      })
+    },
+    onShow: function () {
+      setNotification({
+        ...notification,
+        show: true
+      })
+    },
+    show: true,
+    titulo: "titulo",
+    btnLabel: "Ok"
+  })
+
+
+  setTimeout(() => {
+    notification
+  }, 5000);
+
+  async function login(e: SubmitEvent) {
+
+    try {
+
+      e.preventDefault()
+      setLoading({
+        ...loading,
+        loading: true
+      })
+
+    } catch (error) {
+
+      setLoading({
+        ...loading,
+        loading: false
+      })
+    }
+  }
 
   const router = useRouter()
 
@@ -13,7 +66,9 @@ export default function Home() {
             <div className="card-body">
               <h3 className="card-title text-center mb-4">Login</h3>
 
-              <form id="loginEvent">
+              <form id="loginEvent" onSubmit={function (e) {
+                e.preventDefault()
+              }}>
                 <div className="mb-3">
                   <label htmlFor="email" className="form-label">E-mail</label>
                   <input type="email" className="form-control" id="email" placeholder="Digite seu e-mail"
@@ -38,6 +93,15 @@ export default function Home() {
           </div>
         </div>
       </div>
+      <Loading mensagem={loading.mensagem} loading={loading.loading} />
+      <Notification
+        mensagem={notification.mensagem}
+        show={notification.show}
+        onClose={notification.onClose}
+        onShow={notification.onShow}
+        titulo={notification.titulo}
+        btnLabel={notification.btnLabel}
+      />
     </div>
   );
 }
