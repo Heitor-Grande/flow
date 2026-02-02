@@ -5,8 +5,15 @@ import React, { useState } from "react";
 import { LoadingProps } from "@/types/loading";
 import Notification from "./components/notification";
 import { notificationProps } from "@/types/notification";
+import { userLogin } from "@/types/userLogin";
+import { responseJSON } from "@/types/responseJson";
 
 export default function Home() {
+
+  const [usuarioLogin, setUsuarioLogin] = useState<userLogin>({
+    senha: "",
+    email: ""
+  })
 
   const [loading, setLoading] = useState<LoadingProps>({
     mensagem: "Carregando Login",
@@ -27,15 +34,11 @@ export default function Home() {
         show: true
       })
     },
-    show: true,
+    show: false,
     titulo: "titulo",
     btnLabel: "Ok"
   })
 
-
-  setTimeout(() => {
-    notification
-  }, 5000);
 
   async function login(e: React.FormEvent<HTMLFormElement>) {
 
@@ -47,11 +50,53 @@ export default function Home() {
         loading: true
       })
 
+      const response = await fetch("/api/login", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          senha: usuarioLogin.senha,
+          email: usuarioLogin.email
+        })
+      })
+
+      const responseJSON = await response.json() as responseJSON
+
+      if (responseJSON.success) {
+
+        setLoading({
+          ...loading,
+          loading: false
+        })
+
+
+      }
+      else {
+
+        setLoading({
+          ...loading,
+          loading: false
+        })
+
+        setNotification({
+          ...notification,
+          show: true,
+          mensagem: responseJSON.error || "Erro."
+        })
+      }
+
     } catch (error) {
 
       setLoading({
         ...loading,
         loading: false
+      })
+
+      setNotification({
+        ...notification,
+        show: true,
+        mensagem: "Erro no Nível de Cliente ao Consultar."
       })
     }
   }
@@ -70,13 +115,24 @@ export default function Home() {
                 <div className="mb-3">
                   <label htmlFor="email" className="form-label">E-mail</label>
                   <input type="email" className="form-control" id="email" placeholder="Digite seu e-mail"
+                    onChange={function (e) {
+                      setUsuarioLogin({
+                        ...usuarioLogin,
+                        email: e.target.value
+                      })
+                    }}
                     required />
                 </div>
 
                 <div className="mb-3">
                   <label htmlFor="password" className="form-label">Senha</label>
                   <input type="password" className="form-control" id="password" placeholder="Digite sua senha"
-                    required />
+                    required onChange={function (e) {
+                      setUsuarioLogin({
+                        ...usuarioLogin,
+                        senha: e.target.value
+                      })
+                    }} />
                 </div>
 
                 <button type="submit" className="btn btn-secondary d-block w-100">Entrar</button>
