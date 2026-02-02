@@ -68,7 +68,7 @@ export async function POST(req: Request) {
 
     } catch (error) {
 
-        console.log(error)
+        console.log(error  )
         return responseApi("Erro ao tentar Logar.", error, false, 500)
     }
 }
