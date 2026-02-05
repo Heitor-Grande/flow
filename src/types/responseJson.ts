@@ -1,6 +1,6 @@
 export interface responseJSON {
     success: boolean
-    message?: string
+    message: string
     data: any
     error?: string
 }

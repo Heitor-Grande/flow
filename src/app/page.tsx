@@ -10,6 +10,8 @@ import { responseJSON } from "@/types/responseJson";
 
 export default function Home() {
 
+  const router = useRouter()
+
   const [usuarioLogin, setUsuarioLogin] = useState<userLogin>({
     senha: "",
     email: ""
@@ -62,7 +64,6 @@ export default function Home() {
       })
 
       const responseJSON = await response.json() as responseJSON
-
       if (responseJSON.success) {
 
         setLoading({
@@ -70,7 +71,8 @@ export default function Home() {
           loading: false
         })
 
-
+        localStorage.setItem("utoken", responseJSON.data.token)
+        router.push("/menuOficina")
       }
       else {
 
@@ -82,7 +84,7 @@ export default function Home() {
         setNotification({
           ...notification,
           show: true,
-          mensagem: responseJSON.error || "Erro."
+          mensagem: responseJSON.message || "Erro."
         })
       }
 
@@ -100,8 +102,6 @@ export default function Home() {
       })
     }
   }
-
-  const router = useRouter()
 
   return (
     <div className="container-fluid bg-secondary">

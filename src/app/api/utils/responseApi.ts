@@ -7,7 +7,7 @@ export default function responseApi(message: string, dataOrError: any, success: 
             return Response.json({ success: true, message: message, data: dataOrError }, { status: status })
         }
         else {
-            return Response.json({ success: false, error: String(dataOrError) }, { status: status })
+            return Response.json({ success: false, message: message, error: String(dataOrError) }, { status: status })
         }
     } catch (error) {
 

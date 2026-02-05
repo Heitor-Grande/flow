@@ -1,7 +1,7 @@
 import jwt from "jsonwebtoken"
 import bcrypt from "bcrypt"
 import cryptoJS from "crypto-js"
-import { NextRequest } from "next/server"
+import { NextRequest, NextResponse } from "next/server"
 import responseApi from "../utils/responseApi"
 
 export function criptografar(dado: string) {
@@ -84,7 +84,7 @@ export function validarJWT(req: NextRequest) {
 
         if (tokenValido) {
 
-            return tokenValido
+            return true
         }
         else {
 
@@ -95,7 +95,6 @@ export function validarJWT(req: NextRequest) {
         return responseApi("Erro ao Verificar Token", error, false, 500)
     }
 }
-
 
 export async function gerarHash(texto: string) {
 
@@ -145,5 +144,50 @@ export async function validarHash(texto: string, hash: string) {
             success: false,
             error: error
         }
+    }
+}
+
+
+type RateData = {
+    count: number
+    expiresAt: number
+}
+
+const store = new Map<string, RateData>()
+
+const LIMIT = 5           // 5 requests
+const WINDOW_MS = 60_000   // por 1 minuto
+
+export async function rateLimit(req: NextRequest) {
+
+    try {
+        const ip =
+            req.headers.get("x-forwarded-for")?.split(",")[0]?.trim() ??
+            "anonymous"
+
+        const now = Date.now()
+
+        const data = store.get(ip)
+        // primeira vez ou janela expirou
+        if (!data || now > data.expiresAt) {
+
+            store.set(ip, {
+                count: 1,
+                expiresAt: now + WINDOW_MS
+            })
+            return "OK"
+        }
+
+        // estourou o limite
+        if (data.count >= LIMIT) {
+            return responseApi("Muitas Requisições, aguarde.", null, false, 401)
+        }
+
+        // ainda pode
+        data.count++
+        return "OK"
+    } catch (error) {
+
+        return responseApi("Erro no Rate Limit", null, false, 500)
     }
 }
