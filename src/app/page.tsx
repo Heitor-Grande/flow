@@ -66,20 +66,10 @@ export default function Home() {
       const responseJSON = await response.json() as responseJSON
       if (responseJSON.success) {
 
-        setLoading({
-          ...loading,
-          loading: false
-        })
-
         localStorage.setItem("utoken", responseJSON.data.token)
         router.push("/menuOficina")
       }
       else {
-
-        setLoading({
-          ...loading,
-          loading: false
-        })
 
         setNotification({
           ...notification,
@@ -87,6 +77,11 @@ export default function Home() {
           mensagem: responseJSON.message || "Erro."
         })
       }
+
+      setLoading({
+        ...loading,
+        loading: false
+      })
 
     } catch (error) {
 

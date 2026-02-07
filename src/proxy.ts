@@ -30,6 +30,6 @@ export async function proxy(req: NextRequest) {
 
 export const config = {
     matcher: [
-        "/api/:path((?!login).*)"
+        "/api/:path((?!login|criarCliente).*)"
     ]
 }

@@ -1,14 +1,39 @@
 'use client'
-
-import { useState } from "react"
+import React, { useState } from "react"
 import { Cliente } from "../../types/cliente"
 import Loading from "../components/loading"
 import { LoadingProps } from "@/types/loading"
+import { responseJSON } from "@/types/responseJson"
+import { notificationProps } from "@/types/notification"
+import { useRouter } from "next/navigation"
+import Notification from "../components/notification"
+
 export default function CriarContaCliente() {
+
+    const router = useRouter()
 
     const [loading, setLoading] = useState<LoadingProps>({
         mensagem: "Carregando",
         loading: false
+    })
+
+    const [notification, setNotification] = useState<notificationProps>({
+        mensagem: "mensagem",
+        onClose: function () {
+            setNotification({
+                ...notification,
+                show: false
+            })
+        },
+        onShow: function () {
+            setNotification({
+                ...notification,
+                show: true
+            })
+        },
+        show: false,
+        titulo: "titulo",
+        btnLabel: "Ok"
     })
 
     const [cliente, setCliente] = useState<Cliente>({
@@ -20,11 +45,81 @@ export default function CriarContaCliente() {
         telefone: ""
     })
 
+    async function criarNovaConta(e: React.FormEvent) {
+
+        try {
+
+            e.preventDefault()
+
+            setLoading(function (loading) {
+                return {
+                    ...loading,
+                    loading: true
+                }
+            })
+
+            const response = await fetch("/api/criarCliente", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                },
+                body: JSON.stringify(cliente)
+            })
+
+            const responseJSON = await response.json() as responseJSON
+         
+            if (responseJSON.success) {
+
+
+                setNotification({
+                    ...notification,
+                    show: true,
+                    mensagem: responseJSON.message
+                })
+
+                setTimeout(() => {
+
+                    router.push("/")
+                }, 2000);
+            }
+            else {
+                
+                setNotification({
+                    ...notification,
+                    show: true,
+                    mensagem: responseJSON.message || "Erro."
+                })
+            }
+
+            setLoading(function (loading) {
+                return {
+                    ...loading,
+                    loading: false
+                }
+            })
+        } catch (error) {
+
+
+            setLoading(function (loading) {
+                return {
+                    ...loading,
+                    loading: false
+                }
+            })
+
+            setNotification({
+                ...notification,
+                show: true,
+                mensagem: "Erro ao executar comando no Navegador."
+            })
+        }
+    }
+
     return (
         <div className="container-fluid pt-4 bg-secondary justify-content-center align-items-center vh-100">
             <div className="card w-75 shadow p-4 m-auto">
                 <h3 className="text-center mb-2">Cadastro de Cliente</h3>
-                <form id="formCadCliente">
+                <form id="formCadCliente" onSubmit={criarNovaConta}>
 
                     <div className="mb-1">
                         <label htmlFor="oficina" className="form-label">Oficina</label>
@@ -38,6 +133,7 @@ export default function CriarContaCliente() {
                             })
                         }} id="oficina" className="form-select" required>
                             <option value="">Selecione...</option>
+                            <option value="48069970804">Teste de Desenvolvimento</option>
                         </select>
                     </div>
                     <div className="mb-1">
@@ -110,6 +206,14 @@ export default function CriarContaCliente() {
                 </form>
             </div>
             <Loading mensagem={loading.mensagem} loading={loading.loading} />
+            <Notification
+                mensagem={notification.mensagem}
+                show={notification.show}
+                onClose={notification.onClose}
+                onShow={notification.onShow}
+                titulo={notification.titulo}
+                btnLabel={notification.btnLabel}
+            />
         </div>
     )
 }
