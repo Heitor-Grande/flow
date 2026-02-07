@@ -61,14 +61,14 @@ export async function POST(req: Request) {
 
             return responseApi("Bem-Vindo", {
                 success: true,
-                redirectTo: tipoUser == "userOficina" ? "/oficina/main" : "/oficina/cliente/main",
+                redirectTo: tipoUser == "userOficina" ? "/menuOficina" : "/menuCliente",
                 token: jwt.token
             }, true, 201)
         }
 
     } catch (error) {
 
-        console.log(error  )
+        console.log(error)
         return responseApi("Erro ao tentar Logar.", error, false, 500)
     }
 }

@@ -67,7 +67,7 @@ export default function Home() {
       if (responseJSON.success) {
 
         localStorage.setItem("utoken", responseJSON.data.token)
-        router.push("/menuOficina")
+        router.push(responseJSON.data.redirectTo)
       }
       else {
 
